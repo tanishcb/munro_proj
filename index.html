@@ -1,0 +1,159 @@
+<html>
+<head>
+<link rel="shortcut icon" href="image/favicon.png" />
+<title>Munnrothuruth Island</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- leaflet css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css">
+<!-- icons -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<!-- custom style css -->
+<link rel="stylesheet" href="css/style.css">
+<!-- leaflet siderbar css -->
+<link rel="stylesheet" href="css/leaflet-sidebar.css" />
+<!-- leaflet full screen css -->
+<link rel='stylesheet' href='css/leaflet.fullscreen.css'/>
+<!-- Measure Tool css -->
+<link rel="stylesheet" href="css/leaflet.measure.css" />
+<!-- Overview map css -->
+<link rel="stylesheet" href="css/Control.MiniMap.min.css" />
+<!-- print css -->
+<link rel="stylesheet" href="css/leaflet.print.css"/>
+
+
+<script src="js/proj4.js"></script>
+<!-- leaflet js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
+<!-- for info tool projection -->
+<script src="js/proj4leaflet.js"></script>
+<!-- application js -->
+<script src="js/app.js"></script>
+<!-- leaflet siderbar js -->
+<script src="js/leaflet-sidebar.js"></script>
+<!-- leaflet full screen js -->
+<script src='js/Leaflet.fullscreen.min.js'></script>
+<!-- leaflet measure tool -->
+<script src="js/leaflet.measure.js"></script>
+<!-- call jquery -->
+<script src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
+<!-- Overview map js -->
+<script src="js/Control.MiniMap.min.js"></script>
+<!-- print js -->
+<script src="js/leaflet.print.js"></script>
+<!-- <script src="http://localhost:8080/geoserver/pdf/info.json?var=printConfig"></script> -->
+
+
+</head>
+<body onload="init()">
+  	 <h1 id="title">
+	 <center>Munnrothuruth Island</center>
+	 </h1>	
+<div style="height:100%;width:100%;">
+ 
+
+	<div id="maparea">
+			<div id="lyrarea">
+				<table class="gridtable2" id="lgndtbl">
+						<th>Layers</th>
+						<tr><td><input type="checkbox" class="tcp_lyr" id="munro_ward" onclick=addlyr_wd(this.value) value="munro_ward">Ward Boundary</td></tr>
+						<tr><td><input type="checkbox" class="tcp_lyr" id="munro_landuse" onclick=addlyr_lu(this.value) value="munro_landuse">Landuse</td></tr>
+						<tr><td><input type="checkbox" class="tcp_lyr" id="munro_cadastry" onclick=addlyr_ca(this.value) value="munro_cadastry">Cadastry</td></tr>
+						<tr><td><input type="checkbox" class="tcp_lyr" id="munro_canal" onclick=addlyr_cl(this.value) value="munro_canal">Canal</td></tr>
+						<tr><td><input type="checkbox" class="tcp_lyr" id="munro_road" onclick=addlyr_rd(this.value) value="munro_road">Roads</td></tr>
+						<tr><td><input type="checkbox" class="tcp_lyr" id="munro_rail" onclick=addlyr_rl(this.value) value="munro_rail">Rail</td></tr>
+						<tr><td><input type="checkbox" class="tcp_lyr" id="munro_resort" onclick=addlyr_rs(this.value) value="munro_resort">Resort</td></tr>
+								
+				</table>
+				<table class="gridtable2" id="lgndtbl">
+					<th>BaseMaps</th>
+					<tr><td colspan=2>
+					<select class="sel" id="basemap" onchange="togglebasemap(this.value)">
+					<option>Choose Basemaps</option>
+					<option value="OSM">OpenStreetMap</option>
+					<option value="ESRI">Esri World Imagery</option>
+					<option value="Google">Google Satellite</option>
+					</select>
+					</td></tr>
+				</table>
+				<table class="gridtable2" id="lgndtbl">
+					<th colspan=2>Query</th>
+					<tr><td colspan=2>
+					<select class="sel" id="lsgb_type"><option>Choose Landuse Type</option></select>
+					</td></tr>
+					<tr>
+							<td><button class="button button2" onclick="spatialresult_survey()">Submit</button></td>
+							<td><button class="button button2" onclick="clearresult_survey()">Clear</button></td>
+					</tr>
+				</table>
+				<table class="gridtable2" id="lgndtbl">
+				<th colspan=2>Locate Lat & Long</th>
+					<tr><td>Latitude </td><td><input  type="text" class="sel" id="ddlat" name="fname" placeholder="eg:11.0646"></td></tr>
+					<tr><td>Longitude </td><td><input type="text" class="sel" id="ddlon" name="fname" placeholder="eg:76.0705"></td></tr>
+					<tr><td colspan=2><button class="button button2" id="myBtn5" onclick="gotolatlong()">Find</button></td></tr>
+					<tr><td colspan=2><button class="button button2" id="myBtn5" onclick="clearmarker()">Clear</button></td></tr>
+				</table>
+			</div>
+			<!-- map container -->
+			<div id="map" class="sidebar-map"></div>
+			
+			<!-- leaflet side bar  -->
+			<div id="sidebar" class="sidebar collapsed">
+				<!-- Nav tabs -->
+				<div class="sidebar-tabs">
+					<ul role="tablist">
+						<li><a href="#legend" role="tab"><i class="fa fa-bars"></i></a></li>												
+					</ul>		  
+				</div>
+
+				<!-- Tab panes -->
+				<div class="sidebar-content">
+					<!-- Legend -->
+					<div class="sidebar-pane" id="legend">
+						<h1 class="sidebar-header">
+							Legend<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
+							<div>
+								<table class="gridtable" id="lgndtbl">
+									<tr id="tr_wd"><td><div id="wd"></div></td></tr>
+									<tr id="tr_lu"><td><div id="lu"></div></td></tr>
+									<tr id="tr_ca"><td><div id="ca"></div></td></tr>
+									<tr id="tr_cl"><td><div id="cl"></div></td></tr>
+									<tr id="tr_rd"><td><div id="rd"></div></td></tr>
+									<tr id="tr_rl"><td><div id="rl"></div></td></tr>
+									<tr id="tr_rs"><td><div id="rs"></div></td></tr>
+								</table>
+							</div>
+					</div> <!-- Legend -->
+					
+				</div>
+			
+			</div>		
+			
+			
+			
+	</div>
+	<!-- footer container -->
+	<div id="footer">
+			<table class="gridtable" id="footertbl">
+			<tr>
+	
+			<td id="cp"><b>2022©IKM - DEVELOPED BY KSDI | KSITM</b></td>
+			<td id="sm"></td>
+			
+			<td id="lo"><div id="latlng"><b>Lat , Long</b></div></td>
+			
+			<td id="zo"><div id="currentZoom"></div></td>
+			</tr>
+			</table>
+      </div>
+	  
+	  
+	  	<div id="fade"></div>
+        <div id="modal">
+            <img id="loader" src="image/loading.gif" />
+        </div>	
+	  
+</div>
+</body>
+</html>	  
+
